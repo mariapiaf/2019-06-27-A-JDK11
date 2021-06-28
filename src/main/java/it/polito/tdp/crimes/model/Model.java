@@ -14,6 +14,8 @@ public class Model {
 	
 	private EventsDao dao;
 	private Graph<String, DefaultWeightedEdge> grafo;
+	private List<String> percorsoMigliore;
+	private int pesoMinore;
 	
 	public Model() {
 		dao = new EventsDao();
@@ -53,6 +55,48 @@ public class Model {
 		
 		return result;
 	}
+	
+	public List<String> getPercorso(String partenza, String arrivo){
+		percorsoMigliore = new ArrayList<>();
+		pesoMinore = Integer.MAX_VALUE;
+		List<String> parziale = new ArrayList<>();
+		parziale.add(partenza);
+		cerca(parziale, arrivo, 0);
+		return percorsoMigliore;
+	}
+	
+	public void cerca(List<String> parziale, String arrivo, int livello) {
+		if(parziale.size() == grafo.vertexSet().size() || parziale.get(parziale.size()-1).equals(arrivo)) {
+			if(this.calcolaPeso(parziale) < pesoMinore) {
+				pesoMinore = calcolaPeso(parziale);
+				percorsoMigliore = new ArrayList<>(parziale);
+			}
+			return;
+		}
+
+		String ultimo = parziale.get(parziale.size()-1);
+		List<String> vicini = Graphs.neighborListOf(this.grafo, ultimo);
+		
+		for(String vicino: vicini) {
+			if(!parziale.contains(vicino)) {
+				parziale.add(vicino);
+				cerca(parziale, arrivo, livello+1);
+				parziale.remove(vicino);
+			}
+		}
+		
+	}
+	
+	public int calcolaPeso(List<String> parziale) {
+		int peso = 0;
+		for(int i =0; i< parziale.size()-1; i++) {
+			DefaultWeightedEdge e = grafo.getEdge(parziale.get(i), parziale.get(i+1));
+			int pesoArco = (int) grafo.getEdgeWeight(e);
+			peso += pesoArco;
+		}
+		return peso;
+	}
+	
 	
 	public int nVertici() {
 		return grafo.vertexSet().size();

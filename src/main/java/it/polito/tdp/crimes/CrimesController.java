@@ -70,6 +70,19 @@ public class CrimesController {
     void doCalcolaPercorso(ActionEvent event) {
     	txtResult.clear();
     	txtResult.appendText("Calcola percorso...\n");
+    	Arco arco = boxArco.getValue();
+    	if(arco == null) {
+    		txtResult.appendText("Devi selezionare un arco!");
+    		return;
+    	}
+    	
+    	String partenza = arco.getId1();
+    	String arrivo = arco.getId2();
+    	model.getPercorso(partenza, arrivo);
+    	txtResult.appendText("Il percorso minimo è: \n");
+    	for(String s: model.getPercorso(partenza, arrivo)) {
+    		txtResult.appendText(s +" \n");
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
