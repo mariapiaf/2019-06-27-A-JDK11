@@ -7,6 +7,7 @@ package it.polito.tdp.crimes;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.crimes.model.Arco;
 import it.polito.tdp.crimes.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -25,16 +26,16 @@ public class CrimesController {
     private URL location;
 
     @FXML // fx:id="boxCategoria"
-    private ComboBox<?> boxCategoria; // Value injected by FXMLLoader
+    private ComboBox<String> boxCategoria; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxAnno"
-    private ComboBox<?> boxAnno; // Value injected by FXMLLoader
+    private ComboBox<Integer> boxAnno; // Value injected by FXMLLoader
 
     @FXML // fx:id="btnAnalisi"
     private Button btnAnalisi; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxArco"
-    private ComboBox<?> boxArco; // Value injected by FXMLLoader
+    private ComboBox<Arco> boxArco; // Value injected by FXMLLoader
 
     @FXML // fx:id="btnPercorso"
     private Button btnPercorso; // Value injected by FXMLLoader
@@ -46,6 +47,23 @@ public class CrimesController {
     void doCreaGrafo(ActionEvent event) {
     	txtResult.clear();
     	txtResult.appendText("Crea grafo...\n");
+    	
+    	String categoria = boxCategoria.getValue();
+    	Integer anno = boxAnno.getValue();
+    	if(categoria == null || anno == null) {
+    		txtResult.appendText("Devi selezionare un anno e una categoria!");
+    		return;
+    	}
+    	
+    	this.model.creaGrafo(categoria, anno);
+    	txtResult.appendText("GRAFO CREATO\n");
+    	txtResult.appendText("# VERTICI: " + model.nVertici()+"\n");
+    	txtResult.appendText("# ARCHI: " + model.nArchi()+"\n");
+    	txtResult.appendText("Vertici con peso massimo: \n");
+    	for(Arco a : model.getArchiMax()) {
+    		txtResult.appendText(a.toString()+"\n");
+    	}
+    	boxArco.getItems().addAll(model.getArchiMax());
     }
 
     @FXML
@@ -67,5 +85,7 @@ public class CrimesController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	boxCategoria.getItems().addAll(model.getCategorie());
+    	boxAnno.getItems().addAll(model.getAnni());
     }
 }
